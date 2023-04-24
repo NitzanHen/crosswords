@@ -17,10 +17,12 @@ type Builder struct {
 	debug bool
 	calls int
 	start time.Time
+
+	listener *func(cw *Crossword)
 }
 
 func NewBuilder(width, height int, words []Word, debug bool) Builder {
-	return Builder{width, height, NewCorpus(words), debug, 0, time.Time{}}
+	return Builder{width, height, NewCorpus(words), debug, 0, time.Time{}, nil}
 }
 
 func (builder *Builder) getExactCutRegex(cutData []string) regexp.Regexp {
@@ -113,23 +115,21 @@ func (builder *Builder) isValidOffset(
 	return regex.MatchString(string(word))
 }
 
-func (builder *Builder) debugBuild(word Word, cw *Crossword) {
-	fmt.Printf("\033[0;1H")
-	fmt.Printf(" %f Seconds, %d calls, %d cached \n%s\n%s\n\n",
-		time.Since(builder.start).Seconds(),
-		builder.calls,
-		len(builder.corpus.cache),
-		word,
-		cw.PrintData(),
-		//Map(components, func(cuts structure.Set[Cut]) []Cut { return cuts.ToSlice() }),
-	)
-}
+// func (builder *Builder) debugBuild(word Word, cw *Crossword) {
+// 	fmt.Printf("\033[0;1H")
+// 	fmt.Printf(" %f Seconds, %d calls, %d cached \n%s\n%s\n\n",
+// 		time.Since(builder.start).Seconds(),
+// 		builder.calls,
+// 		len(builder.corpus.cache),
+// 		word,
+// 		cw.PrintData(),
+// 		//Map(components, func(cuts structure.Set[Cut]) []Cut { return cuts.ToSlice() }),
+// 	)
+// }
 
 // Attempts to find a suitable crossword with the given cuts embedded
 func (builder *Builder) build(cw *Crossword, cuts structure.Set[Cut]) *Crossword {
-	if builder.debug {
-		builder.calls++
-	}
+	builder.calls++
 
 	if cuts.Size() == 0 {
 		// Crossword is complete
@@ -193,8 +193,9 @@ func (builder *Builder) build(cw *Crossword, cuts structure.Set[Cut]) *Crossword
 					})
 				}
 
-				if builder.debug && builder.calls%2_000 == 0 {
-					builder.debugBuild(word, &next)
+				if builder.listener != nil && builder.calls%2_000 == 0 {
+					//builder.debugBuild(word, &next)
+					(*builder.listener)(&next)
 				}
 
 				// Try filling in each of the components
@@ -214,9 +215,6 @@ func (builder *Builder) build(cw *Crossword, cuts structure.Set[Cut]) *Crossword
 				}
 
 				// Result is non nil, we've completed the embedding
-				// if builder.debug {
-				// 	builder.debugBuild(word, result, nil)
-				// }
 				return result
 			}
 		}
@@ -232,4 +230,8 @@ func (builder *Builder) Build() *Crossword {
 	builder.start = time.Now()
 
 	return builder.build(&cw, cuts)
+}
+
+func (builder *Builder) SetListener(listener func(cw *Crossword)) {
+	builder.listener = &listener
 }

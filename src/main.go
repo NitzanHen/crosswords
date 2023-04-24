@@ -41,6 +41,10 @@ func main() {
 
 			shuffled := shuffle(words)
 			builder := crossword.NewBuilder(6, 6, shuffled, false)
+			builder.SetListener(func(cw *crossword.Crossword) {
+				fmt.Printf("\033[2;0H")
+				fmt.Printf("\n%s\n\n", cw.PrintData())
+			})
 
 			startingWords := shuffled[:10]
 
