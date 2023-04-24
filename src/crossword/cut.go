@@ -7,10 +7,10 @@ import (
 )
 
 type Cut struct {
-	Row         int
-	Col         int
-	Orientation Orientation
-	Len         int
+	Row         int         `json:"row"`
+	Col         int         `json:"col"`
+	Orientation Orientation `json:"orientation"`
+	Len         int         `json:"len"`
 }
 
 func (cut *Cut) String() string {

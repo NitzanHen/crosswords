@@ -9,7 +9,7 @@ import (
 type Crossword struct {
 	CutMatrix
 
-	Embeddings []CutWithWord
+	Embeddings []CutWithWord `json:"embeddings"`
 }
 
 func NewCrossword(width, height int) Crossword {
@@ -103,8 +103,8 @@ func (cw *Crossword) Copy() Crossword {
 }
 
 type CutWithWord struct {
-	Cut  Cut
-	Word Word
+	Cut  Cut  `json:"cut"`
+	Word Word `json:"word"`
 }
 
 func (cutword *CutWithWord) Copy() CutWithWord {

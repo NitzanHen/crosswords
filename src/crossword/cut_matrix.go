@@ -8,15 +8,13 @@ import (
 )
 
 type CutMatrix struct {
-	Width  int
-	Height int
+	Width  int `json:"width"`
+	Height int `json:"height"`
 
-	// Indicates an Empty cell.
-	Empty string
-	// Indicates a cell that cannot have a value, i.e. cannot be in any cut.
-	Stop string
+	Empty string `json:"empty"` // Indicates an Empty cell.
+	Stop  string `json:"stop"`  // Indicates a cell that cannot have a value, i.e. cannot be in any cut.
 
-	Data [][]string
+	Data [][]string `json:"data"`
 }
 
 func NewCutMatrix(width, height int, empty, stop string) CutMatrix {
