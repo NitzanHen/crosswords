@@ -1,8 +1,9 @@
 package structure_test
 
 import (
-	"nitzanhen/crossword/src/structure"
 	"testing"
+
+	"github.com/nitzanhen/crossword/src/structure"
 )
 
 type Pair struct {

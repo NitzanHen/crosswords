@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
-	"nitzanhen/crossword/src/crossword"
-	"nitzanhen/crossword/src/structure"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/nitzanhen/crossword/src/crossword"
+	"github.com/nitzanhen/crossword/src/structure"
 )
 
 type BuildResult struct {

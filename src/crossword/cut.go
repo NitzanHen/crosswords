@@ -2,7 +2,8 @@ package crossword
 
 import (
 	"fmt"
-	"nitzanhen/crossword/src/structure"
+
+	"github.com/nitzanhen/crossword/src/structure"
 )
 
 type Cut struct {

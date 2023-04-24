@@ -1,7 +1,7 @@
 package crossword
 
 import (
-	"nitzanhen/crossword/src/structure"
+	"github.com/nitzanhen/crossword/src/structure"
 )
 
 func Filter[T any](items []T, predicate func(T) bool) []T {

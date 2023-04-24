@@ -2,11 +2,12 @@ package crossword
 
 import (
 	"fmt"
-	"nitzanhen/crossword/src/structure"
 	"regexp"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/nitzanhen/crossword/src/structure"
 )
 
 type Builder struct {

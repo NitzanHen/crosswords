@@ -2,8 +2,9 @@ package crossword
 
 import (
 	"fmt"
-	"nitzanhen/crossword/src/structure"
 	"strings"
+
+	"github.com/nitzanhen/crossword/src/structure"
 )
 
 type CutMatrix struct {
