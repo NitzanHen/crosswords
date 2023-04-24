@@ -1,9 +1,13 @@
 import json
 import matplotlib.pyplot as plt
 
-with open("./output/result-76597-0.json", encoding="utf8") as file:
-    results = json.loads(file.read())
-    print(len(results))
+results = []
+
+for i in range(15):
+    with open("./output/result-76597-0.json", encoding="utf8") as file:
+        results.extend(json.loads(file.read())) 
+
+print(len(results))
 
 successful = list(filter(lambda r: r["Success"], results))
 print(len(successful))

@@ -20,8 +20,8 @@ type BuildResult struct {
 }
 
 const (
-	BATCH_SIZE  = 1000
-	NUM_BATCHES = 10
+	BATCH_SIZE  = 200
+	NUM_BATCHES = 15
 )
 
 func main() {
@@ -51,7 +51,7 @@ func main() {
 				start = time.Now()
 				resultChan <- builder.Build()
 			}()
-			// i love you meod meod boyfriend !important
+
 			select {
 
 			case res := <-resultChan:
@@ -60,7 +60,7 @@ func main() {
 
 				fmt.Printf("Success in %f seconds:\n%s\n", elapsed, res.PrintData())
 
-			case <-time.After(1 * time.Second):
+			case <-time.After(10 * time.Second):
 				elapsed := time.Since(start)
 				results.Add(BuildResult{nil, startingWords, false, elapsed.Seconds()})
 
