@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 
 results = []
 
-for i in range(15):
-    with open("./output/result-76597-0.json", encoding="utf8") as file:
+for i in range(50):
+    with open(f"./output/result-37967-{i}.json", encoding="utf8") as file:
         results.extend(json.loads(file.read())) 
 
 print(len(results))
@@ -14,7 +14,7 @@ print(len(successful))
 
 
 counts = {
-    "{:.1f}".format(i / 10): 0 for i in range(0, 20 * 10 + 1)
+    "{:.1f}".format(i / 10): 0 for i in range(0, 10 * 10 + 1)
 }
 for res in successful:
     bucket = "{:.1f}".format(res['Time'])

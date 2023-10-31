@@ -16,13 +16,20 @@ import (
 type BuildResult struct {
 	Result        *crossword.Crossword
 	StartingWords []crossword.Word
+	Width         int
+	Height        int
 	Success       bool
 	Time          float64
+	Calls         int
+	Failures      int
 }
 
 const (
-	BATCH_SIZE  = 200
-	NUM_BATCHES = 15
+	BATCH_SIZE  = 50
+	NUM_BATCHES = 50
+	WIDTH       = 5
+	HEIGHT      = 5
+	TIMEOUT     = 10 * time.Second
 )
 
 func main() {
@@ -40,11 +47,11 @@ func main() {
 			resultChan := make(chan *crossword.Crossword, 1)
 
 			shuffled := shuffle(words)
-			builder := crossword.NewBuilder(6, 6, shuffled, false)
-			builder.SetListener(func(cw *crossword.Crossword) {
-				fmt.Printf("\033[2;0H")
-				fmt.Printf("\n%s\n\n", cw.PrintData())
-			})
+			builder := crossword.NewBuilder(WIDTH, HEIGHT, shuffled, false)
+			// builder.SetListener(func(cw *crossword.Crossword) {
+			// 	fmt.Printf("\033[2;0H")
+			// 	fmt.Printf("\n%s\n\n", cw.PrintData())
+			// })
 
 			startingWords := shuffled[:10]
 
@@ -61,13 +68,13 @@ func main() {
 
 			case res := <-resultChan:
 				elapsed := time.Since(start).Seconds()
-				results.Add(BuildResult{res, startingWords, true, elapsed})
+				results.Add(BuildResult{res, startingWords, WIDTH, HEIGHT, true, elapsed, builder.Calls, builder.Failures})
 
 				fmt.Printf("Success in %f seconds:\n%s\n", elapsed, res.PrintData())
 
-			case <-time.After(10 * time.Second):
-				elapsed := time.Since(start)
-				results.Add(BuildResult{nil, startingWords, false, elapsed.Seconds()})
+			case <-time.After(TIMEOUT):
+				elapsed := time.Since(start).Seconds()
+				results.Add(BuildResult{nil, startingWords, WIDTH, HEIGHT, false, elapsed, builder.Calls, builder.Failures})
 
 				fmt.Println("Timed out.")
 			}
@@ -121,7 +128,10 @@ func shuffle[T any](items []T) []T {
 func writeResult(results []BuildResult, runId, batchId int) {
 	data, _ := json.MarshalIndent(results, "", "  ")
 
+	os.Mkdir("./output", 0755)
 	filename := fmt.Sprintf("./output/result-%d-%d.json", runId, batchId)
 
-	os.WriteFile(filename, data, 0644)
+	if err := os.WriteFile(filename, data, 0644); err != nil {
+		log.Fatalf("%v", err)
+	}
 }

@@ -14,15 +14,16 @@ type Builder struct {
 	width, height int
 	corpus        Corpus
 
-	debug bool
-	calls int
-	start time.Time
+	debug    bool
+	Calls    int
+	Failures int
+	start    time.Time
 
 	listener *func(cw *Crossword)
 }
 
 func NewBuilder(width, height int, words []Word, debug bool) Builder {
-	return Builder{width, height, NewCorpus(words), debug, 0, time.Time{}, nil}
+	return Builder{width, height, NewCorpus(words), debug, 0, 0, time.Time{}, nil}
 }
 
 func (builder *Builder) getExactCutRegex(cutData []string) regexp.Regexp {
@@ -129,7 +130,7 @@ func (builder *Builder) isValidOffset(
 
 // Attempts to find a suitable crossword with the given cuts embedded
 func (builder *Builder) build(cw *Crossword, cuts structure.Set[Cut]) *Crossword {
-	builder.calls++
+	builder.Calls++
 
 	if cuts.Size() == 0 {
 		// Crossword is complete
@@ -146,7 +147,7 @@ func (builder *Builder) build(cw *Crossword, cuts structure.Set[Cut]) *Crossword
 			// We have a cut with no matches.
 			// It's an inconsistency, stop here.
 
-			//fmt.Printf("INCONSISTENCY: %s %s\n\n", strings.Join(cw.GetCutData(cut), ""), cut.String())
+			builder.Failures++
 			return nil
 		}
 
@@ -193,7 +194,7 @@ func (builder *Builder) build(cw *Crossword, cuts structure.Set[Cut]) *Crossword
 					})
 				}
 
-				if builder.listener != nil && builder.calls%2_000 == 0 {
+				if builder.listener != nil && builder.Calls%2_000 == 0 {
 					//builder.debugBuild(word, &next)
 					(*builder.listener)(&next)
 				}
@@ -202,10 +203,6 @@ func (builder *Builder) build(cw *Crossword, cuts structure.Set[Cut]) *Crossword
 				result := &next
 				for _, component := range components {
 					result = builder.build(result, component)
-
-					// if builder.calls > 1000 {
-					// 	return result
-					// }
 
 					if result == nil {
 						// One of the components cant be completed - try the next embedding
@@ -220,6 +217,8 @@ func (builder *Builder) build(cw *Crossword, cuts structure.Set[Cut]) *Crossword
 		}
 	}
 
+	// No suitable embedding found
+	builder.Failures++
 	return nil
 }
 
